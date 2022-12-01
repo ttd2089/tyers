@@ -10,7 +10,10 @@
 // without requiring you to write your own Unwrap and Is functions.
 package tyers
 
-import "errors"
+import (
+	"errors"
+	"fmt"
+)
 
 // New returns an error that formats as the given text and causes errors.Is to return true when
 // called with errorType as the target.
@@ -18,6 +21,16 @@ func New(errorType error, text string) error {
 	return &typedError{
 		errorType:  errorType,
 		errorValue: errors.New(text),
+	}
+}
+
+// Errorf returns an error that formats according fmt.Errorf applied to the given text and operands
+// and causes errors.Is to return true when called with errorType or any wrapped errors as the
+// target.
+func Errorf(errorType error, text string, a ...any) error {
+	return &typedError{
+		errorType:  errorType,
+		errorValue: fmt.Errorf(text, a...),
 	}
 }
 
@@ -36,6 +49,11 @@ type typedError struct {
 // Error forwards the call to the Error method of the underlying error value.
 func (t *typedError) Error() string {
 	return t.errorValue.Error()
+}
+
+// Unwrap returns the underlying error value.
+func (t *typedError) Unwrap() error {
+	return t.errorValue
 }
 
 // Is returns a bool indicating whether the ErrorType of the TypedError is the target error.
