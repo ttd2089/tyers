@@ -65,3 +65,44 @@ func TestErrorf(t *testing.T) {
 		}
 	})
 }
+
+func TestAs(t *testing.T) {
+
+	t.Run("errors.Is()/returns true for error type", func(t *testing.T) {
+		errorValue := errors.New("error value")
+		errorType := errors.New("error type")
+		underTest := As(errorType, errorValue)
+		if !errors.Is(underTest, errorType) {
+			t.Errorf("expected '%s' to be '%s'", underTest, errorType)
+		}
+	})
+
+	t.Run("errors.Is()/returns true for a err", func(t *testing.T) {
+		err := errors.New("error")
+		errorType := errors.New("error type")
+		underTest := As(errorType, err)
+		if !errors.Is(underTest, err) {
+			t.Errorf("expected '%s' to be '%s'", underTest, err)
+		}
+	})
+
+	t.Run("errors.Is()/returns true for a nested wrapped error", func(t *testing.T) {
+		wrappedError := errors.New("wrapped error")
+		errorType := errors.New("error type")
+		underTest := As(errorType, fmt.Errorf("error: %w", wrappedError))
+		if !errors.Is(underTest, wrappedError) {
+			t.Errorf("expected '%s' to be '%s'", underTest, wrappedError)
+		}
+	})
+
+	t.Run("Error()/formats as err", func(t *testing.T) {
+		errorValue := errors.New("error value")
+		errorType := errors.New("error type")
+		expectedText := errorValue.Error()
+		underTest := As(errorType, errorValue)
+		actualText := underTest.Error()
+		if actualText != expectedText {
+			t.Errorf("expected '%s'; got '%s'", expectedText, actualText)
+		}
+	})
+}

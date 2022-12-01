@@ -34,6 +34,15 @@ func Errorf(errorType error, text string, a ...any) error {
 	}
 }
 
+// As returns an error that formats the same way as err and causes errors.Is to return true when
+// called with errorType or any errors wrapped by err as the target.
+func As(errorType error, err error) error {
+	return &typedError{
+		errorType:  errorType,
+		errorValue: err,
+	}
+}
+
 // A typedError is an error that binds a normal error value with an additional error as its type
 // such that using errors.Is can match the value and any errors it wraps as well as a specific
 // error used to represent a category of error which may not appear in the wrapped values.
